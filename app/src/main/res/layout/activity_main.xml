@@ -1,18 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
+    <Button
+        android:id="@+id/btn_Start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/btn_REQUEST"
+        android:layout_marginTop="112dp"
+        android:text="开始"
+        android:layout_alignLeft="@+id/btn_REQUEST" />
 
-</android.support.constraint.ConstraintLayout>
+    <Button
+        android:id="@+id/btn_REQUEST"
+        android:text="拿一个"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center"
+        android:layout_marginEnd="134dp"
+        android:layout_marginTop="201dp"
+        android:layout_marginRight="134dp"
+        android:layout_alignParentRight="true" />
+
+</RelativeLayout>
