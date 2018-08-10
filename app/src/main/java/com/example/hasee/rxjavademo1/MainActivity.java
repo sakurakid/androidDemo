@@ -32,13 +32,13 @@ public class MainActivity extends AppCompatActivity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                demo();
+                Demo3();
             }
         });
         request.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                request(1);
+                request(96);
             }
         });
 
@@ -283,16 +283,20 @@ public class MainActivity extends AppCompatActivity {
       Flowable<Integer> upstream = Flowable.create(new FlowableOnSubscribe<Integer>() {
           @Override
           public void subscribe(FlowableEmitter<Integer> e) throws Exception {
-              Log.d("233","emit 1");
-              e.onNext(1);
-              Log.d("233","emit 2");
-              e.onNext(2);
-              Log.d("233","emit 3");
-              e.onNext(3);
-              Log.d("233","emit comlete");
-              e.onComplete();
+//              Log.d("233","emit 1");
+//              e.onNext(1);
+//              Log.d("233","emit 2");
+//              e.onNext(2);
+//              Log.d("233","emit 3");
+//              e.onNext(3);
+//              Log.d("233","emit comlete");
+//              e.onComplete();
+              for(int i = 0;i < 10000;i++){
+                  Log.d("233","emit "+i);
+                  e.onNext(i);
+              }
           }
-      }, BackpressureStrategy.ERROR)
+      }, BackpressureStrategy.DROP)//水缸的大小版本
               .subscribeOn(Schedulers.io())
               .observeOn(AndroidSchedulers.mainThread());//增加一个参数
 
@@ -301,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
           public void onSubscribe(Subscription s) {
               Log.d("233","onsubscribe");
                msubscription = s;
+               s.request(128);
           }
 
           @Override
@@ -326,5 +331,170 @@ public class MainActivity extends AppCompatActivity {
       };
       upstream.subscribe(downstream);
   }
+
+
+  public  void demo1(){
+        Flowable.create(new FlowableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(FlowableEmitter<Integer> e) throws Exception {
+                Log.d("233","current requested "+e.requested());
+
+                Log.d("233", "emit 1");
+                e.onNext(1);
+                Log.d("233", "after emit 1, requested = " + e.requested());
+
+                Log.d("233", "emit 2");
+                e.onNext(2);
+                Log.d("233", "after emit 1, requested = " + e.requested());
+
+                Log.d("233", "emit 3");
+                e.onNext(3);
+                Log.d("233", "after emit 1, requested = " + e.requested());
+
+                Log.d("233", "emit complete");
+                e.onComplete();
+                Log.d("233", "after emit 1, requested = " + e.requested());
+
+
+
+            }
+        },BackpressureStrategy.ERROR)
+                .subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onSubscribe(Subscription s) {
+                        Log.d("233","obSubscribe");
+                        msubscription = s;
+                        s.request(10);
+                       // s.request(100); //再给我一百个！
+
+                    }
+
+                    @Override
+                    public void onNext(Integer integer) {
+                        Log.d("233", "onNext: " + integer);
+
+
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d("233", "onComplete");
+
+
+                    }
+                });
+  }
+    public  void demo2(){
+        Flowable.create(new FlowableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(FlowableEmitter<Integer> e) throws Exception {
+                Log.d("233","current requested "+e.requested());
+
+//                Log.d("233", "emit 1");
+//                e.onNext(1);
+//                Log.d("233", "after emit 1, requested = " + e.requested());
+//
+//                Log.d("233", "emit 2");
+//                e.onNext(2);
+//                Log.d("233", "after emit 1, requested = " + e.requested());
+//
+//                Log.d("233", "emit 3");
+//                e.onNext(3);
+//                Log.d("233", "after emit 1, requested = " + e.requested());
+//
+//                Log.d("233", "emit complete");
+//                e.onComplete();
+//                Log.d("233", "after emit 1, requested = " + e.requested());
+
+
+
+            }
+        },BackpressureStrategy.ERROR)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onSubscribe(Subscription s) {
+                        Log.d("233","obSubscribe");
+                        msubscription = s;
+                        s.request(10);
+                        // s.request(100); //再给我一百个！
+
+                    }
+
+                    @Override
+                    public void onNext(Integer integer) {
+                        Log.d("233", "onNext: " + integer);
+
+
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d("233", "onComplete");
+
+
+                    }
+                });
+    }
+    private void Demo3(){
+        Flowable.create(new FlowableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(FlowableEmitter<Integer> e) throws Exception {
+                Log.d("233","First request = "+e.requested());
+                boolean flag;
+                for (int i = 0;;i++){
+                    flag = false;
+                    while (e.requested()==0){
+                        if (!flag){
+                            Log.d("233","没有值了");
+                            flag = true;
+                        }
+                    }
+                    e.onNext(i);
+                    Log.d("233","emit"+i+"request = "+e.requested());
+                }
+            }
+        },BackpressureStrategy.ERROR)
+                .observeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onSubscribe(Subscription s) {
+                        Log.d("233", "onSubscribe");
+                        msubscription = s;
+
+                    }
+
+                    @Override
+                    public void onNext(Integer integer) {
+                        Log.d("233","onNext "+integer );
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d("233","onComplete");
+
+                    }
+                });
+    }
 
 }
